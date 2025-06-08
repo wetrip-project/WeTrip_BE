@@ -4,8 +4,8 @@ FROM openjdk:21-jdk
 # 2️⃣ 작업 디렉토리 설정
 WORKDIR /app
 
-# 3️⃣ 빌드된 JAR 파일을 컨테이너 내부로 복사
-COPY build/libs/*.jar app.jar
+# 3️⃣ main-server 모듈에서 빌드된 JAR 파일을 복사 (경로 수정)
+COPY main-server/build/libs/*.jar app.jar
 
 # 4️⃣ 8080 포트 개방
 EXPOSE 8080

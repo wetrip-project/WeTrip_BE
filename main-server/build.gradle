@@ -6,8 +6,16 @@ plugins {
 group = 'com.wetrip'
 version = '0.0.1-SNAPSHOT'
 
+bootJar {
+    archiveFileName = 'app.jar'
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
 dependencies {
-    implementation project(":common")
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

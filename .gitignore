@@ -42,6 +42,3 @@ weTrip/src/main/resources/.env
 .env
 *.env
 **/.env
-
-gradlew
-gradlew.bat

@@ -1,0 +1,20 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+group = 'com.wetrip'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation project(":common")
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-security' // 채팅 사용자 인증이 필요하다면
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

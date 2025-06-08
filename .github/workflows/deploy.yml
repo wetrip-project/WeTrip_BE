@@ -1,0 +1,112 @@
+name: Deploy wetrip_backend
+
+on:
+  push:
+    branches: [ 'main' ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-24.04
+    outputs:
+      docker-tag: ${{ steps.set-docker-tag.outputs.DOCKER_TAG }}
+
+    defaults:
+      run:
+        working-directory: main-server # ⭐ weTrip/main-server 폴더 기준으로 작업
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+          submodules: true
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Get current time
+        id: current-time
+        uses: josStorer/get-current-time@v2.0.2
+        with:
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+
+      - name: Docker build
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker build -f ./Dockerfile -t whwkahd3/wetrip-main:${{ steps.current-time.outputs.formattedTime }} .
+          docker push whwkahd3/wetrip-main:${{ steps.current-time.outputs.formattedTime }}
+
+      - name: Set Docker Tag Output
+        id: set-docker-tag
+        run: echo 'DOCKER_TAG=${{ steps.current-time.outputs.formattedTime }}' >> $GITHUB_OUTPUT
+
+  cd:
+    runs-on: ubuntu-20.04
+    needs: [ci]
+    env:
+      DOCKER_TAG: ${{ needs.ci.outputs.docker-tag }}
+
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Check logs
+            echo "📜 Fetching logs from running container..."
+            docker logs --tail 100 careit
+            
+            # Check containers
+            echo "🐳 Checking running containers"
+            docker ps -a
+            
+            # Check docker tags
+            echo "🐳 Docker Tag: ${{ env.DOCKER_TAG }}"
+            
+            # Pull the new image
+            echo "🐳 Docker Image Pull"
+            docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+
+            # Stop & Remove existing container if exists
+            if [ $(docker ps -aq -f name=wetrip-main) ]; then
+              echo "🐳 Stopping existing container"
+              docker stop wetrip-main || true
+              echo "🐳 Removing existing container"
+              docker rm wetrip-main || true
+            fi
+            
+            # Copy .env file into the new container
+            echo "📂 Copying .env file into container"
+            docker create --name temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
+            docker commit temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            docker rm temp_container
+            
+            # Start new container
+            echo "🐳 Docker Run"
+            docker run -d --name wetrip-main \
+              -p 8080:8080 \
+              --log-driver json-file \
+              --log-opt max-size=10m \
+              --log-opt max-file=3 \
+              whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            
+            # Check
+            echo "🐳 Docker ps"
+            docker ps
+            
+            # Cleanup old images
+            echo "🧹 Cleaning up old Docker images"
+            docker image prune -af --filter "dangling=false"

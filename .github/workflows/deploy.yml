@@ -51,7 +51,7 @@ jobs:
         run: echo 'DOCKER_TAG=${{ steps.current-time.outputs.formattedTime }}' >> $GITHUB_OUTPUT
 
   cd:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [ci]
     env:
       DOCKER_TAG: ${{ needs.ci.outputs.docker-tag }}

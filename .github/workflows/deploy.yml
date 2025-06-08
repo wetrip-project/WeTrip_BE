@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: main-server # ⭐ weTrip/main-server 폴더 기준으로 작업
+        working-directory: . # ⭐ weTrip/main-server 폴더 기준으로 작업
 
     steps:
       - name: Checkout

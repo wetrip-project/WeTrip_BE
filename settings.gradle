@@ -1,2 +1,5 @@
 rootProject.name = 'weTrip'
-include 'main-server', 'chat-server'
+include 'main-server'
+include 'chat-server'
+include 'common:auth'
+include 'common:domain'

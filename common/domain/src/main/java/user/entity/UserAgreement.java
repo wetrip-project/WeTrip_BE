@@ -33,8 +33,8 @@ public class UserAgreement {
     @Column(nullable = false)
     private Boolean emailConsentProvided = false;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId
-//    @JoinColumn(name = "id")
-//    private User user;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
+    private User user;
 }

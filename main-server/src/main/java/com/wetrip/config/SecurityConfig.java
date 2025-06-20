@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 기능 비활성화 (개발 중 혹은 API 서버일 경우 비활성화함)
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 확인용
                 .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
-                        .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**").permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
+                        .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**", "/actuator/health").permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
                         .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
                 )
                 .oauth2Login(oauth -> oauth // OAuth2 로그인 설정

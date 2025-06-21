@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -16,6 +17,7 @@ public class SecurityConfig {
     // 생성자 주입으로 받음 → @Service로 등록된 CustomOAuth2UserService 자동 주입
     private final CustomOAuth2UserService customOAuth2UserService; // 사용자 정의 OAuth2 사용자 정보 서비스 (ex: 카카오 로그인 처리 로직)
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler; // 로그인 성공 시 추가 동작을 정의하는 핸들러
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -25,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**").permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
                         .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth -> oauth // OAuth2 로그인 설정
                         .loginPage("/login") // 사용자 지정 로그인 페이지 경로 (ex: /login 요청 시 로그인 폼 표시)
                         .defaultSuccessUrl("/home", true) // 로그인 성공 시 이동할 기본 URL (true면 무조건 이 URL로 이동)

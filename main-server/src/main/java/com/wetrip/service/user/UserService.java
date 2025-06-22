@@ -2,8 +2,8 @@ package com.wetrip.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import user.entity.User;
-import user.repository.UserRepository;
+import com.wetrip.user.entity.User;
+import com.wetrip.user.repository.UserRepository;
 
 import java.util.NoSuchElementException;
 

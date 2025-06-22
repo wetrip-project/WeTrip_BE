@@ -31,7 +31,7 @@ public class JoinPostService {
   private final TagRepository tagRepository;
 
   @Transactional
-  public void createPost(final User user, final PostCreateRequestDto request) {
+  public Long createPost(final User user, final PostCreateRequestDto request) {
     JoinPost joinPost = request.toEntity(user, request);
     final var newPost = joinPostRepository.save(joinPost);
 
@@ -63,5 +63,7 @@ public class JoinPostService {
         .toList();
 
     tagRepository.saveAll(allTags);
+
+    return newPost.getId();
   }
 }

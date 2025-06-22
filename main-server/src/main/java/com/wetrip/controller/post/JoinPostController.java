@@ -23,12 +23,12 @@ public class JoinPostController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public void createPost(
+  public Long createPost(
       Authentication authentication,
       @RequestBody final PostCreateRequestDto postCreateRequestDto) {
     String userId = (String) authentication.getPrincipal();
     User user = userService.findByUser(Long.parseLong(userId));
 
-    joinPostService.createPost(user, postCreateRequestDto);
+    return joinPostService.createPost(user, postCreateRequestDto);
   }
 }

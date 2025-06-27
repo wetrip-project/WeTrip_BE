@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
     id 'org.springframework.boot' version '3.4.5' apply false
     id 'io.spring.dependency-management' version '1.1.7' apply false
 }
@@ -15,10 +16,22 @@ java {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
 
     group = rootProject.group
     version = rootProject.version
+
+    bootJar {
+        enabled false
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    jar {
+        enabled false
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 
     repositories {
         mavenCentral()

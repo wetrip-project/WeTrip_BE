@@ -1,8 +1,10 @@
 package com.wetrip.config;
 
+import com.wetrip.dto.CorsProperties;
 import com.wetrip.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -12,9 +14,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Arrays;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties({CorsProperties.class})
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -23,14 +29,16 @@ public class SecurityConfig {
   private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler; // 로그인 성공 시 추가 동작을 정의하는 핸들러
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final Environment env;
+  private final CorsProperties corsProperties;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+        .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable()) // CSRF 보호 기능 비활성화 (개발 중 혹은 API 서버일 경우 비활성화함)
         .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 확인용
         .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
-            .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**")
+            .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**", "/actuator/health")
             .permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
             .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
         )
@@ -53,5 +61,19 @@ public class SecurityConfig {
   private boolean isMock() {
     var profiles = Arrays.asList(env.getActiveProfiles());
     return profiles.contains("mock");
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    var config = new CorsConfiguration();
+    config.setAllowedOrigins(Arrays.asList(corsProperties.origins()));
+    config.setAllowedMethods(Arrays.asList(corsProperties.methods()));
+    config.setMaxAge(corsProperties.maxAge());
+    config.setAllowCredentials(true);
+
+    var source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+
+    return source;
   }
 }

@@ -18,6 +18,7 @@ version = '0.0.1-SNAPSHOT'
 dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-security' // 채팅 사용자 인증이 필요하다면

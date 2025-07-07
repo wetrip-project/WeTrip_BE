@@ -1,7 +1,6 @@
 package com.wetrip.config.interceptor;
 
 import com.wetrip.auth.SimpleJwtValidator;
-import com.wetrip.repository.RedisService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -38,7 +36,6 @@ public class AuthenticationInterceptor implements HandshakeInterceptor {
         attributes.put("isAuthenticated", true);
         return true;
       }
-      return false;
     }
 
     response.setStatusCode(HttpStatus.UNAUTHORIZED);

@@ -17,7 +17,6 @@ public class WebsocketConfig implements WebSocketConfigurer {
   private final ChatApplicationHandler chatApplicationHandler;
   private final AuthenticationInterceptor authenticationInterceptor;
 
-
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry.addHandler(chatApplicationHandler, "/chat")

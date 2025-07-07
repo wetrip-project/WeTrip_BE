@@ -1,5 +1,7 @@
 package com.wetrip.handler;
 
+import com.wetrip.auth.SimpleJwtValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -7,7 +9,10 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Component
+@RequiredArgsConstructor
 public class ChatApplicationHandler extends TextWebSocketHandler {
+
+  private final SimpleJwtValidator jwtValidator;
 
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -20,6 +25,7 @@ public class ChatApplicationHandler extends TextWebSocketHandler {
     TODO: 1. Authentication 로직 개발
             상황 : 채팅방 입장 요청시, JWT토큰검증
      */
+
     super.afterConnectionEstablished(session);
   }
 

@@ -17,6 +17,12 @@ public class SimpleJwtValidator {
 
   private Key key;
 
+  @Value("${jwt.access-token-expiration}")
+  private long accessTokenValidityInMilliseconds;
+
+  @Value("${jwt.refresh-token-expiration}")
+  private long refreshTokenValidityInMilliseconds;
+
   @PostConstruct
   protected void init() {
     this.key = Keys.hmacShaKeyFor(secretKey.getBytes());

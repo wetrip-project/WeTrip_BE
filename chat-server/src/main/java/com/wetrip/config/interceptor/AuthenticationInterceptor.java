@@ -21,7 +21,6 @@ public class AuthenticationInterceptor implements HandshakeInterceptor {
   private static final String BEARER_PREFIX = "Bearer ";
 
   private final SimpleJwtValidator jwtValidator;
-  private final RedisService redisService;
 
   @Override
   public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,

@@ -24,7 +24,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ
-    implementation 'org.springframework.boot:spring-boot-starter-security' // 채팅 사용자 인증이 필요하다면
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'

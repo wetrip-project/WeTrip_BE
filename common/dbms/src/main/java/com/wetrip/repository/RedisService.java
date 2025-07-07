@@ -2,6 +2,7 @@ package com.wetrip.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +19,15 @@ public class RedisService {
     try {
       String jsonValue = objectMapper.writeValueAsString(value);
       stringRedisTemplate.opsForValue().set(key, jsonValue);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("객체를 JSON으로 직렬화할 수 없습니다.", e);
+    }
+  }
+
+  public void setObject(String key, Object value, Duration timeout) {
+    try {
+      String jsonValue = objectMapper.writeValueAsString(value);
+      stringRedisTemplate.opsForValue().set(key, jsonValue, timeout);
     } catch (JsonProcessingException e) {
       throw new RuntimeException("객체를 JSON으로 직렬화할 수 없습니다.", e);
     }

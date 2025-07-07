@@ -3,11 +3,10 @@ package com.wetrip.dto;
 import lombok.Builder;
 import lombok.experimental.Accessors;
 
-@Accessors(chain = true)
+@Builder
 public record SessionInfo(
     Long userId,
-    String roomId,
-    Boolean isAuthenticated
+    String sessionId
 ) {
 
 }

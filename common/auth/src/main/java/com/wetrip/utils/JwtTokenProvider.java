@@ -1,41 +1,36 @@
 package com.wetrip.utils;
 
 
+import com.wetrip.config.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
-    @Value("${jwt.secret}")
-    private String secretKey;
 
+    private final JwtProperties jwtProperties;
     private Key key;
-
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenValidityInMilliseconds;
-
-    @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenValidityInMilliseconds;
 
     @PostConstruct
     protected void init() {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.key = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes());
     }
 
     // Access Token 생성
     public String createAccessToken(String userId) {
-        return createToken(userId, accessTokenValidityInMilliseconds);
+        return createToken(userId, jwtProperties.accessTokenExpiration());
     }
 
     // Refresh Token 생성
     public String createRefreshToken(String userId) {
-        return createToken(userId, refreshTokenValidityInMilliseconds);
+        return createToken(userId, jwtProperties.refreshTokenExpiration());
     }
 
     // 토큰 생성 공통 로직
@@ -44,11 +39,11 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + validityMillis);
 
         return Jwts.builder()
-                .setSubject(userId)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+            .setSubject(userId)
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
     }
 
     // 토큰 유효성 검증
@@ -64,10 +59,10 @@ public class JwtTokenProvider {
     // 토큰에서 사용자 ID 추출
     public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
         return claims.getSubject();
     }
 }

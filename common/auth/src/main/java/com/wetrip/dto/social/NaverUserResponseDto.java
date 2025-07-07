@@ -3,6 +3,7 @@ package com.wetrip.dto.social;
 
 import com.wetrip.dto.OAuth2UserResponseDto;
 import com.wetrip.user.entity.User;
+import com.wetrip.user.enums.LoginType;
 import com.wetrip.utils.SocialResponseUtil;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.Map;
 @Setter
 @Builder
 public class NaverUserResponseDto {
+
     private String socialId;
     private String email;
     private String name;
@@ -26,34 +28,34 @@ public class NaverUserResponseDto {
 
     public static NaverUserResponseDto from(Map<String, Object> response) {
         return NaverUserResponseDto.builder()
-                .socialId(SocialResponseUtil.safeString(response.get("id")))
-                .email(SocialResponseUtil.safeString(response.get("email")))
-                .name(SocialResponseUtil.safeStringOrDefault(response.get("name"), "네이버사용자"))
-                .profileImage(SocialResponseUtil.safeString(response.get("profile_image")))
-                .age(SocialResponseUtil.safeString(response.get("age")))
-                .gender(SocialResponseUtil.safeString(response.get("gender")))
-                .contact(SocialResponseUtil.safeString(response.get("mobile")))
-                .birthday(SocialResponseUtil.safeString(response.get("birthday")))
-                .birthyear(SocialResponseUtil.safeString(response.get("birthyear")))
-                .build();
+            .socialId(SocialResponseUtil.safeString(response.get("id")))
+            .email(SocialResponseUtil.safeString(response.get("email")))
+            .name(SocialResponseUtil.safeStringOrDefault(response.get("name"), "네이버사용자"))
+            .profileImage(SocialResponseUtil.safeString(response.get("profile_image")))
+            .age(SocialResponseUtil.safeString(response.get("age")))
+            .gender(SocialResponseUtil.safeString(response.get("gender")))
+            .contact(SocialResponseUtil.safeString(response.get("mobile")))
+            .birthday(SocialResponseUtil.safeString(response.get("birthday")))
+            .birthyear(SocialResponseUtil.safeString(response.get("birthyear")))
+            .build();
     }
 
     public OAuth2UserResponseDto toOAuth2UserInfo() {
         return OAuth2UserResponseDto.builder()
-                .socialId(this.socialId)
-                .email(this.email)
-                .name(this.name)
-                .loginType(User.LoginType.NAVER)
-                .age(SocialResponseUtil.parseAge(this.age))
-                .gender(SocialResponseUtil.parseGender(this.gender))
-                .contact(this.contact)
-                .profileImage(this.profileImage)
-                .birthDate(SocialResponseUtil.parseBirthday(this.birthday, this.birthyear))
-                .ageConsentProvided(this.age != null)
-                .birthdayConsentProvided(this.birthday != null)
-                .contactConsentProvided(this.contact != null)
-                .emailConsentProvided(this.email != null)
-                .genderConsentProvided(this.gender != null)
-                .build();
+            .socialId(this.socialId)
+            .email(this.email)
+            .name(this.name)
+            .loginType(LoginType.NAVER)
+            .age(SocialResponseUtil.parseAge(this.age))
+            .gender(SocialResponseUtil.parseGender(this.gender))
+            .contact(this.contact)
+            .profileImage(this.profileImage)
+            .birthDate(SocialResponseUtil.parseBirthday(this.birthday, this.birthyear))
+            .ageConsentProvided(this.age != null)
+            .birthdayConsentProvided(this.birthday != null)
+            .contactConsentProvided(this.contact != null)
+            .emailConsentProvided(this.email != null)
+            .genderConsentProvided(this.gender != null)
+            .build();
     }
 }

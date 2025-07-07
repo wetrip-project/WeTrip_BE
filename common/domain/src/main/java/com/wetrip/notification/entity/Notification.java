@@ -1,5 +1,7 @@
 package com.wetrip.notification.entity;
 
+import com.wetrip.notification.enums.NotificationType;
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +31,8 @@ public class Notification {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+//  @Column(nullable = false)
+//  private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private Boolean isChecked = false;
@@ -39,8 +41,4 @@ public class Notification {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", insertable = false, updatable = false)
 //    private User user;
-
-    public enum NotificationType {
-        COMMENT, JOIN_APPLICATION, CHAT, REVIEW_REMINDER
-    }
 }

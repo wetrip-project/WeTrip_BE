@@ -1,5 +1,6 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,27 +15,27 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinComment {
+public class JoinComment extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "post_id", nullable = false)
-    private Long postId;
+  @Column(name = "post_id", nullable = false)
+  private Long postId;
 
-    @Column(name = "author_id", nullable = false)
-    private Long authorId;
+  @Column(name = "author_id", nullable = false)
+  private Long authorId;
 
-    @Column(nullable = false)
-    private String content;
+  @Column(nullable = false)
+  private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime commentTime;
+//  @Column(nullable = false)
+//  private LocalDateTime commentTime;
+//
+//  private LocalDateTime updatedTime;
 
-    private LocalDateTime updatedTime;
-
-    // 관계 매핑
+  // 관계 매핑
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "post_id", insertable = false, updatable = false)
 //    private JoinPost joinPost;

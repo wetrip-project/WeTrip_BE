@@ -1,5 +1,6 @@
 package com.wetrip.review.entity;
 
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Review {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,7 @@ public class Review {
 
     private Byte rating;
 
-    private LocalDateTime reviewDate;
+//    private LocalDateTime reviewDate;
 
     // 관계 매핑
 //    @ManyToOne(fetch = FetchType.LAZY)

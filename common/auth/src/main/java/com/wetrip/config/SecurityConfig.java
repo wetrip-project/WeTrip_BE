@@ -2,8 +2,8 @@ package com.wetrip.config;
 
 import com.wetrip.dto.CorsProperties;
 import com.wetrip.service.CustomOAuth2UserService;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.Arrays;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -46,8 +44,8 @@ public class SecurityConfig {
 
     if (!isMock()) {
       http.oauth2Login(oauth -> oauth // OAuth2 로그인 설정
-          .loginPage("/login") // 사용자 지정 로그인 페이지 경로 (ex: /login 요청 시 로그인 폼 표시)
-          .defaultSuccessUrl("/home", true) // 로그인 성공 시 이동할 기본 URL (true면 무조건 이 URL로 이동)
+//          .loginPage("/login") // 사용자 지정 로그인 페이지 경로 (ex: /login 요청 시 로그인 폼 표시)
+//          .defaultSuccessUrl("/home", true) // 로그인 성공 시 이동할 기본 URL (true면 무조건 이 URL로 이동)
           .userInfoEndpoint(userInfo -> userInfo // 사용자 정보 가져올 서비스 설정
               .userService(customOAuth2UserService) // 카카오 사용자 정보 처리
           )

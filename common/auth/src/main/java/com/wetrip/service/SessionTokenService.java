@@ -3,12 +3,11 @@ package com.wetrip.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wetrip.dto.TokenInfoDto;
-import jakarta.annotation.PostConstruct;
+import com.wetrip.utils.JwtTokenProvider;
 import java.time.Duration;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +18,9 @@ public class SessionTokenService {
 
   private final StringRedisTemplate redisTemplate; // 자동 주입(StringRedisTemplate로 교체)
   private final ObjectMapper objectMapper;
+  private final JwtTokenProvider jwtTokenProvider;
 
-  private static final String TOKEN_PREFIX = "token:";
+  //  private static final String TOKEN_PREFIX = "token:";
   private static final String USER_TOKEN_PREFIX = "user_tokens:";
   private static final Duration TOKEN_EXPIRATION = Duration.ofDays(1); // 24시간
 
@@ -36,10 +36,6 @@ public class SessionTokenService {
       // 사용자별 토큰 정보 저장
       redisTemplate.opsForValue().set(userTokenKey, tokenJson, TOKEN_EXPIRATION);
 
-      // Access Token으로 userId 조회를 위한 매핑 저장
-      String accessTokenKey = TOKEN_PREFIX + tokenInfo.getAccessToken();
-      redisTemplate.opsForValue().set(accessTokenKey, userId.toString(), TOKEN_EXPIRATION);
-
       log.info("토큰 정보가 Redis에 저장되었습니다. userId: {}", userId);
       log.info("Redis에 저장하는 AccessToken = {}", tokenInfo.getAccessToken());
     } catch (JsonProcessingException e) {
@@ -53,7 +49,7 @@ public class SessionTokenService {
     try {
       String hashTag = "{" + userId + "}";
       String userTokenKey = USER_TOKEN_PREFIX + hashTag;
-      String tokenJson = (String) redisTemplate.opsForValue().get(userTokenKey);
+      String tokenJson = redisTemplate.opsForValue().get(userTokenKey);
 
       if (tokenJson == null) {
         return Optional.empty();
@@ -69,48 +65,65 @@ public class SessionTokenService {
 
   // 액세스 토큰으로 사용자 ID 조회
   public Optional<Long> getUserIdByAccessToken(String accessToken) {
-    String accessTokenKey = TOKEN_PREFIX + accessToken;
-    String userIdStr = (String) redisTemplate.opsForValue().get(accessTokenKey);
-
-    if (userIdStr == null) {
-      return Optional.empty();
-    }
-
     try {
-      return Optional.of(Long.parseLong(userIdStr));
-    } catch (NumberFormatException e) {
-      log.error("사용자 ID 파싱 오류: {}", userIdStr);
+      if (!jwtTokenProvider.validateToken(accessToken)) {
+        log.debug("유효하지 않은 JWT 토큰입니다.");
+        return Optional.empty();
+      }
+
+      String userIdString = jwtTokenProvider.getUserIdFromToken(accessToken);
+      Long userId = Long.parseLong(userIdString);
+
+      Optional<TokenInfoDto> tokenInfo = getTokenInfoByUserId(userId);
+
+      if (tokenInfo.isPresent() && accessToken.equals(tokenInfo.get().getAccessToken())) {
+        return Optional.of(userId);
+      }
+      log.debug("Redis에 저장된 토큰과 일치하지 않습니다. userId: {}", userId);
+      return Optional.empty();
+    } catch (Exception e) {
+      log.error("Access Token에서 userId 추출 중 오류 발생", e);
       return Optional.empty();
     }
   }
 
   // 토큰 정보 삭제
-  public void deleteTokenInfo(Long userId, String accessToken) {
+  public void deleteTokenInfo(Long userId) {
     String hashTag = "{" + userId + "}";
-
     String userTokenKey = USER_TOKEN_PREFIX + hashTag;
-    String accessTokenKey = TOKEN_PREFIX + accessToken;
 
     redisTemplate.unlink(userTokenKey);
-    redisTemplate.unlink(accessTokenKey);
 
     log.info("토큰 정보가 삭제되었습니다. userId: {}", userId);
   }
 
   // 토큰 만료 시간 연장
-  public void extendTokenExpiration(Long userId, String accessToken) {
+  public void extendTokenExpiration(Long userId) {
     String hashTag = "{" + userId + "}";
-
     String userTokenKey = USER_TOKEN_PREFIX + hashTag;
-    String accessTokenKey = TOKEN_PREFIX + accessToken;
 
     redisTemplate.expire(userTokenKey, TOKEN_EXPIRATION);
-    redisTemplate.expire(accessTokenKey, TOKEN_EXPIRATION);
+
+    log.info("토큰 만료 시간이 연장되었습니다. userId: {}", userId);
   }
 
   // 토큰 존재 여부 확인
   public boolean existsToken(String accessToken) {
-    String accessTokenKey = TOKEN_PREFIX + accessToken;
-    return Boolean.TRUE.equals(redisTemplate.hasKey(accessTokenKey));
+    try {
+      if (!jwtTokenProvider.validateToken(accessToken)) {
+        return false;
+      }
+
+      String userIdString = jwtTokenProvider.getUserIdFromToken(accessToken);
+      Long userId = Long.parseLong(userIdString);
+
+      Optional<TokenInfoDto> tokenInfo = getTokenInfoByUserId(userId);
+
+      return tokenInfo.isPresent() &&
+          accessToken.equals(tokenInfo.get().getAccessToken());
+    } catch (Exception e) {
+      log.error("토큰 존재 여부 확인 중 오류 발생", e);
+      return false;
+    }
   }
 }

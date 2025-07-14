@@ -4,7 +4,6 @@ package com.wetrip.service;
 import com.wetrip.dto.TokenInfoDto;
 import com.wetrip.dto.TokenResponseDto;
 import com.wetrip.utils.JwtTokenProvider;
-import java.util.Date;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

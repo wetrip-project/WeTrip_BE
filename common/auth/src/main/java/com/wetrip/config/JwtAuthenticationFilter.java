@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends
 
   private final JwtTokenProvider jwtTokenProvider;
   private final SessionTokenService sessionTokenService;
-
   private final Environment env;
 
   private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -54,7 +53,7 @@ public class JwtAuthenticationFilter extends
               userIdFromRedis.get());
           if (tokenInfo.isPresent()) {
             sessionTokenService.saveTokenInfo(userIdFromRedis.get(), tokenInfo.get());
-            sessionTokenService.extendTokenExpiration(userIdFromRedis.get(), token);
+            sessionTokenService.extendTokenExpiration(userIdFromRedis.get());
 
             // 추후 신고 누적에 따른 차단 및 관리자 권한 기능 고려
             UsernamePasswordAuthenticationToken authentication =
@@ -83,7 +82,6 @@ public class JwtAuthenticationFilter extends
     }
     return null;
   }
-
 
   public boolean isMock() {
     var profiles = Arrays.asList(env.getActiveProfiles());

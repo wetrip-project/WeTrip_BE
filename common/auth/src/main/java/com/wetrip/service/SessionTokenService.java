@@ -9,6 +9,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SessionTokenService {
 
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final StringRedisTemplate redisTemplate; // 자동 주입(StringRedisTemplate로 교체)
   private final ObjectMapper objectMapper;
 
   private static final String TOKEN_PREFIX = "token:";
@@ -26,7 +27,10 @@ public class SessionTokenService {
   // 토큰 정보를 Redis에 저장
   public void saveTokenInfo(Long userId, TokenInfoDto tokenInfo) {
     try {
-      String userTokenKey = USER_TOKEN_PREFIX + userId;
+
+      String hashTag = "{" + userId + "}";
+
+      String userTokenKey = USER_TOKEN_PREFIX + hashTag;
       String tokenJson = objectMapper.writeValueAsString(tokenInfo);
 
       // 사용자별 토큰 정보 저장
@@ -47,7 +51,8 @@ public class SessionTokenService {
   // 사용자 ID로 토큰 정보 조회
   public Optional<TokenInfoDto> getTokenInfoByUserId(Long userId) {
     try {
-      String userTokenKey = USER_TOKEN_PREFIX + userId;
+      String hashTag = "{" + userId + "}";
+      String userTokenKey = USER_TOKEN_PREFIX + hashTag;
       String tokenJson = (String) redisTemplate.opsForValue().get(userTokenKey);
 
       if (tokenJson == null) {
@@ -81,18 +86,22 @@ public class SessionTokenService {
 
   // 토큰 정보 삭제
   public void deleteTokenInfo(Long userId, String accessToken) {
-    String userTokenKey = USER_TOKEN_PREFIX + userId;
+    String hashTag = "{" + userId + "}";
+
+    String userTokenKey = USER_TOKEN_PREFIX + hashTag;
     String accessTokenKey = TOKEN_PREFIX + accessToken;
 
-    redisTemplate.delete(userTokenKey);
-    redisTemplate.delete(accessTokenKey);
+    redisTemplate.unlink(userTokenKey);
+    redisTemplate.unlink(accessTokenKey);
 
     log.info("토큰 정보가 삭제되었습니다. userId: {}", userId);
   }
 
   // 토큰 만료 시간 연장
   public void extendTokenExpiration(Long userId, String accessToken) {
-    String userTokenKey = USER_TOKEN_PREFIX + userId;
+    String hashTag = "{" + userId + "}";
+
+    String userTokenKey = USER_TOKEN_PREFIX + hashTag;
     String accessTokenKey = TOKEN_PREFIX + accessToken;
 
     redisTemplate.expire(userTokenKey, TOKEN_EXPIRATION);

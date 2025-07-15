@@ -63,9 +63,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
       default -> throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다: " + registrationId);
     };
 
-    // DB에서 User 정보 조회
-    //User user = userRepository.findBySocialId(socialId).orElseThrow();
-
     // 토큰 생성
     String accessToken = jwtTokenProvider.createAccessToken(user.getId().toString());
     String refreshToken = jwtTokenProvider.createRefreshToken(user.getId().toString());

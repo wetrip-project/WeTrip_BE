@@ -20,7 +20,6 @@ public class SessionTokenService {
   private final ObjectMapper objectMapper;
   private final JwtTokenProvider jwtTokenProvider;
 
-  //  private static final String TOKEN_PREFIX = "token:";
   private static final String USER_TOKEN_PREFIX = "user_tokens:";
   private static final Duration TOKEN_EXPIRATION = Duration.ofDays(1); // 24시간
 

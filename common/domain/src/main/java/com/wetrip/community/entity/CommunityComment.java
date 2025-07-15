@@ -1,5 +1,6 @@
 package com.wetrip.community.entity;
 
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityComment {
+public class CommunityComment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +30,11 @@ public class CommunityComment {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+//  @Column(nullable = false)
+//  private LocalDateTime createdAt;
+//
+//  @Column(nullable = false)
+//  private LocalDateTime updatedAt;
 
     private String image;
 

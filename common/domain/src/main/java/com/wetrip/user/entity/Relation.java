@@ -1,5 +1,6 @@
 package com.wetrip.user.entity;
 
+import com.wetrip.user.enums.RelationshipType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,4 @@ public class Relation {
 //    @JoinColumn(name = "to_user_id", insertable = false, updatable = false)
 //    private User toUser; // 관계 대상 유저
 
-    public enum RelationshipType {
-        FOLLOW, BLOCK, REPORT
-    }
 }

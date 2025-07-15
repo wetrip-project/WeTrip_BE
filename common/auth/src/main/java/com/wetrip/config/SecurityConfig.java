@@ -38,16 +38,16 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable()) // CSRF 보호 기능 비활성화 (개발 중 혹은 API 서버일 경우 비활성화함)
         .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 확인용
         .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
-            .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**", "/actuator/health")
+            .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**",
+                "/actuator/health", "/auth/**")
             .permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
             .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
         )
+        .formLogin(form -> form.disable())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     if (!isMock()) {
       http.oauth2Login(oauth -> oauth // OAuth2 로그인 설정
-          .loginPage("/login") // 사용자 지정 로그인 페이지 경로 (ex: /login 요청 시 로그인 폼 표시)
-          .defaultSuccessUrl("/home", true) // 로그인 성공 시 이동할 기본 URL (true면 무조건 이 URL로 이동)
           .userInfoEndpoint(userInfo -> userInfo // 사용자 정보 가져올 서비스 설정
               .userService(customOAuth2UserService) // 카카오 사용자 정보 처리
           )

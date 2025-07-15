@@ -1,6 +1,6 @@
 package com.wetrip.dto.request;
 
-import com.wetrip.post.entity.JoinPost.RecruitmentStatus;
+import com.wetrip.post.enums.RecruitmentStatus;
 import lombok.Builder;
 import com.wetrip.post.entity.JoinPost;
 import com.wetrip.user.entity.User;

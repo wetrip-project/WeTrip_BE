@@ -1,5 +1,6 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.post.enums.PostType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +39,4 @@ public class RecentViews {
 //    @JoinColumn(name = "user_id", insertable = false, updatable = false)
 //    private User user;
 
-    public enum PostType {
-        JOIN_POST, COMMUNITY
-    }
 }

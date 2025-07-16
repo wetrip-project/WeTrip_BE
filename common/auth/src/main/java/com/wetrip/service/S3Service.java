@@ -1,6 +1,7 @@
 package com.wetrip.service;
 
 
+import jakarta.annotation.PostConstruct;
 import java.net.URL;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

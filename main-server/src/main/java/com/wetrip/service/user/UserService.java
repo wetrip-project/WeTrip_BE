@@ -10,6 +10,7 @@ import com.wetrip.user.repository.UserRepository;
 
 import java.util.NoSuchElementException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class UserService {
     }
 
     public void validateNickname(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("닉네임을 입력해주세요.");
         }
 
@@ -38,17 +39,19 @@ public class UserService {
     }
 
     @Transactional
-    public void updateNickname(Long userId, String name) {
+    public User updateNickname(Long userId, String name) {
         validateNickname(name);
         User user = findByUser(userId);
         user.setName(name);
+        return user;
     }
 
     @Transactional
-    public void updateGenderAge(Long userId, User.Gender gender, Integer age) {
+    public User updateGenderAge(Long userId, User.Gender gender, Integer age) {
         User user = findByUser(userId);
         user.setGender(gender);
         user.setAge(age);
+        return user;
     }
 
     @Transactional
@@ -67,9 +70,16 @@ public class UserService {
         userTripTypeRepository.saveAll(userTripTypes);
     }
 
+    public List<Long> findTripTypeId(Long userId) {
+        return userTripTypeRepository.findByUserId(userId).stream()
+            .map(UserTripType::getTripTypeId)
+            .toList();
+    }
+
     @Transactional
-    public void updateProfileImage(Long userId, String profileImage) {
+    public User updateProfileImage(Long userId, String profileImage) {
         User user = findByUser(userId);
-        user.setProfileImage(profileImage);  //userdto 리턴?
+        user.setProfileImage(profileImage);
+        return user;
     }
 }

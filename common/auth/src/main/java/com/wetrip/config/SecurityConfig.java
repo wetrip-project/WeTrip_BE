@@ -2,6 +2,7 @@ package com.wetrip.config;
 
 import com.wetrip.dto.CorsProperties;
 import com.wetrip.service.CustomOAuth2UserService;
+import jakarta.security.auth.message.config.AuthConfig;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,7 +39,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
             .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**", "/actuator/health")
             .permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
-            .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
+       .requestMatchers("/api/**").permitAll()
+        .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
         )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -3,6 +3,7 @@ package com.wetrip.controller.user;
 import com.wetrip.dto.UserRequestDto.GenderAgeRequest;
 import com.wetrip.dto.UserRequestDto.NicknameRequest;
 import com.wetrip.dto.UserRequestDto.TripTypeRequest;
+import com.wetrip.dto.UserResponseDto;
 import com.wetrip.service.S3Service;
 import com.wetrip.service.user.UserService;
 import com.wetrip.user.entity.User;
@@ -28,22 +29,42 @@ public class UserController {
     private final S3Service s3Service;
 
     @PostMapping("/nickname")
-    public ResponseEntity<Map<String, String>> saveNickname(
+    public ResponseEntity<UserResponseDto> saveNickname(
         @AuthenticationPrincipal String userId,
         @RequestBody NicknameRequest request) {
-        userService.updateNickname(Long.parseLong(userId), request.getName());
-        return ResponseEntity.ok(Map.of("message", "닉네임이 저장되었습니다."));
+
+        User updatedUser = userService.updateNickname(Long.parseLong(userId), request.getName());
+        return ResponseEntity.ok(new UserResponseDto(updatedUser));
     }
 
-    @PostMapping("/gender-age")
-    public ResponseEntity<Map<String, String>> saveGenderAge(
+    @GetMapping("/nickname")
+    public ResponseEntity<Map<String, String>> getNickname(
+        @AuthenticationPrincipal String userId) {
+
+        User user = userService.findByUser(Long.parseLong(userId));
+        return ResponseEntity.ok(Map.of("nickname", user.getName()));
+    }
+
+    @PostMapping("/gender_age")
+    public ResponseEntity<UserResponseDto> saveGenderAge(
         @AuthenticationPrincipal String userId,
         @RequestBody GenderAgeRequest request) {
-        userService.updateGenderAge(Long.parseLong(userId), request.getGender(), request.getAge());
-        return ResponseEntity.ok(Map.of("message", "성별과 나이가 저장되었습니다."));
+
+        User updatedUser = userService.updateGenderAge(Long.parseLong(userId), request.getGender(), request.getAge());
+        return ResponseEntity.ok(new UserResponseDto(updatedUser));
     }
 
-    @PostMapping("/profile-photo-url")
+    @GetMapping("/gender_age")
+    public ResponseEntity<Map<String, Object>> getGenderAge(
+        @AuthenticationPrincipal String userId) {
+
+        User user = userService.findByUser(Long.parseLong(userId));
+        return ResponseEntity.ok(Map.of(
+            "gender", user.getGender(),
+            "age", user.getAge()));
+    }
+
+    @PostMapping("/profile_photo_url")
     public ResponseEntity<Map<String, String>> getProfileUploadUrl(
         @AuthenticationPrincipal String userId,
         @RequestBody Map<String, String> request) {
@@ -55,36 +76,30 @@ public class UserController {
         Duration duration = Duration.ofMinutes(10);
 
         URL presignedUrl = s3Service.generatePresignedUploadUrl(prefix, fileName, extension, duration);
-
         return ResponseEntity.ok(Map.of("uploadUrl", presignedUrl.toString()));
     }
 
-    @PostMapping("/profile-photo-save")
-    public ResponseEntity<Map<String, String>> saveProfileUpload(
+    @PostMapping("/profile_photo_save")
+    public ResponseEntity<UserResponseDto> saveProfileUpload(
         @AuthenticationPrincipal String userId,
         @RequestBody Map<String, String> request) {
 
         String fileName = request.get("fileName");
-
         //클라이언트가 업로드 완료 후 최종 URL 생성
         String imageUrl = "https://wetripbucket.s3.amazonaws.com/profile/" + userId + "/" + fileName;
-
-        userService.updateProfileImage(Long.parseLong(userId), imageUrl);
-
-        return ResponseEntity.ok(Map.of("message", "프로필 이미지가 저장되었습니다.",
-            "profileImageUrl", imageUrl));
+        User updatedUser = userService.updateProfileImage(Long.parseLong(userId), imageUrl);
+        return ResponseEntity.ok(new UserResponseDto(updatedUser));
     }
 
-    @GetMapping("/profile-photo")
+    @GetMapping("/profile_photo")
     public ResponseEntity<Map<String, String>> getProfilePhoto(
         @AuthenticationPrincipal String userId) {
 
         User user = userService.findByUser(Long.parseLong(userId));
-
         return ResponseEntity.ok(Map.of("profileImageUrl", user.getProfileImage()));
     }
 
-    @DeleteMapping("/profile-photo")
+    @DeleteMapping("/profile_photo")
     public ResponseEntity<Map<String, String>> deleteProfilePhoto(
         @AuthenticationPrincipal String userId,
         @RequestBody Map<String, String> request) {
@@ -95,15 +110,24 @@ public class UserController {
         s3Service.deleteObject(prefix, fileName);
 
         userService.updateProfileImage(Long.parseLong(userId), null);
-
         return ResponseEntity.ok(Map.of("message", "프로필 이미지가 삭제되었습니다."));
     }
 
-    @PostMapping("/trip-type")
+    @PostMapping("/trip_type")
     public ResponseEntity<Map<String, String>> saveTripType(
         @AuthenticationPrincipal String userId,
         @RequestBody TripTypeRequest request) {
+
         userService.updateTripType(Long.parseLong(userId), request.getTripTypeId());
         return ResponseEntity.ok(Map.of("message", "여행 타입이 저장되었습니다."));
     }
+
+    @GetMapping("/trip_type")
+    public ResponseEntity<Map<String, Object>> getTripType(
+        @AuthenticationPrincipal String userId) {
+
+        var tripTypeId = userService.findTripTypeId(Long.parseLong(userId));
+        return ResponseEntity.ok(Map.of("tripTypeId", tripTypeId));
+    }
 }
+

@@ -19,6 +19,6 @@ public class UserRequestDto {
 
     @Getter
     public static class TripTypeRequest{
-        private List<Long> tripTypeId;  //tripTypeName으로 해야 하는지
+        private List<Long> tripTypeId;
     }
 }

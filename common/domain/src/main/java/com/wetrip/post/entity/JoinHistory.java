@@ -1,5 +1,6 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.post.enums.JoinStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +52,4 @@ public class JoinHistory {
 //    @JoinColumn(name = "user_id", insertable = false, updatable = false)
 //    private User user;
 
-    public enum JoinStatus {
-        IN_PROGRESS, COMPLETED
-    }
 }

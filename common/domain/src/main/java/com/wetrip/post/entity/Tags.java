@@ -1,6 +1,5 @@
 package com.wetrip.post.entity;
 
-import com.wetrip.post.entity.RecentViews.PostType;
 import com.wetrip.post.enums.TagType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

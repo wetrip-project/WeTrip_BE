@@ -1,5 +1,8 @@
 package com.wetrip.user.entity;
 
+import com.wetrip.user.enums.Gender;
+import com.wetrip.user.enums.LoginType;
+import com.wetrip.user.enums.MBTI;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +37,9 @@ public class User {
     @Column(nullable = false)
     private MBTI mbti;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, updatable = false)
-    private Date createAt; // 가입일
+//  @Temporal(TemporalType.TIMESTAMP)
+//  @Column(nullable = false, updatable = false)
+//  private Date createdAt; // 가입일
 
     @Column(length = 512)
     private String profileImage;
@@ -101,21 +104,8 @@ public class User {
 //    @OneToMany(mappedBy = "reviewee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private List<Review> receivedReviews;
 
-    @PrePersist
-    protected void onCreate() { // 가입일 자동 저장
-        this.createAt = new Date();
-    }
-
-    public enum Gender {
-        female, male, none
-    }
-
-    public enum MBTI {
-        ISTJ, ISTP, ISFJ, ISFP, INTJ, INTP, INFJ, INFP,
-        ESTJ, ESTP, ESFJ, ESFP, ENTJ, ENTP, ENFJ, ENFP, none
-    }
-
-    public enum LoginType {
-        KAKAO, GOOGLE, NAVER
-    }
+//  @PrePersist
+//  protected void onCreate() { // 가입일 자동 저장
+//    this.createdAt = new Date();
+//  }
 }

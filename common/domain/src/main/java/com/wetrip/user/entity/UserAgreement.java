@@ -37,4 +37,22 @@ public class UserAgreement {
     @MapsId
     @JoinColumn(name = "id")
     private User user;
+
+    public static UserAgreement from(
+        User user,
+        boolean ageConsentProvided,
+        boolean birthdayConsentProvided,
+        boolean contactConsentProvided,
+        boolean emailConsentProvided,
+        boolean genderConsentProvided
+    ){
+        return UserAgreement.builder()
+            .user(user)
+            .ageConsentProvided(ageConsentProvided)
+            .birthdayConsentProvided(birthdayConsentProvided)
+            .contactConsentProvided(contactConsentProvided)
+            .emailConsentProvided(emailConsentProvided)
+            .genderConsentProvided(genderConsentProvided)
+            .build();
+    }
 }

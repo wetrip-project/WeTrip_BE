@@ -1,5 +1,7 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.post.enums.ApplicationStatus;
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinApplication {
+public class JoinApplication extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +33,8 @@ public class JoinApplication {
     @Column(nullable = false)
     private ApplicationStatus status;
 
-    @Column(nullable = false)
-    private LocalDateTime applicationTime;
+//    @Column(nullable = false)
+//    private LocalDateTime applicationTime;
 
     // 관계 매핑
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -43,8 +45,5 @@ public class JoinApplication {
 //    @JoinColumn(name = "user_id", insertable = false, updatable = false)
 //    private User user;
 
-    public enum ApplicationStatus {
-        WAITING, ACCEPTED, REJECTED
-    }
 }
 

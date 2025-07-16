@@ -1,5 +1,7 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.post.enums.BookmarkType;
+import com.wetrip.user.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JoinBookmark {
+public class JoinBookmark extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +32,8 @@ public class JoinBookmark {
     @Column(nullable = false)
     private BookmarkType bookmarkType;
 
-    @Column(nullable = false)
-    private LocalDateTime bookmarkedAt;
+//    @Column(nullable = false)
+//    private LocalDateTime bookmarkedAt;
 
     @Column(nullable = false)
     private Integer bookmarkCount = 0;
@@ -43,8 +45,4 @@ public class JoinBookmark {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", insertable = false, updatable = false)
 //    private User user;
-
-    public enum BookmarkType {
-        POST, COMMUNITY
-    }
 }

@@ -1,5 +1,8 @@
 package com.wetrip.post.entity;
 
+import com.wetrip.post.enums.RecruitmentStatus;
+import com.wetrip.user.entity.BaseEntity;
+import com.wetrip.user.enums.Gender;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import lombok.AllArgsConstructor;
@@ -22,7 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class JoinPost {
+public class JoinPost extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,9 +72,9 @@ public class JoinPost {
 
     private Integer recruitmentCount;
 
-    @Column(nullable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
+//  @Column(nullable = false)
+//  @CreatedDate
+//  private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private Long viewCount = 0L;
@@ -101,16 +104,5 @@ public class JoinPost {
 //    @OneToMany(mappedBy = "joinPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private List<JoinComment> comments;
 
-    public enum Gender {
-        female, male, none
-    }
-
-    public enum RecruitmentStatus {
-        completed, recruiting
-    }
-
-    public enum Tag {
-        s20s, s30s, s40s, s50s, female, male
-    }
 }
 

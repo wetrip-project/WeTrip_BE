@@ -35,6 +35,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.h2database:h2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
+
     // Kotlin (dotenv 때문에)
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-common:1.9.22'

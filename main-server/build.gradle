@@ -19,6 +19,7 @@ dependencies {
 
     api project(':common:domain')
     api project(':common:auth')
+    implementation 'software.amazon.awssdk:s3:2.20.148'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'

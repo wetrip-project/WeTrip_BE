@@ -1,6 +1,6 @@
 package com.wetrip.dto;
 
-import com.wetrip.user.entity.User;
+import com.wetrip.user.enums.Gender;
 import java.util.List;
 import lombok.Getter;
 
@@ -13,12 +13,17 @@ public class UserRequestDto {
 
     @Getter
     public static class GenderAgeRequest{
-        private User.Gender gender;
+        private Gender gender;
         private Integer age;
     }
 
     @Getter
     public static class TripTypeRequest{
         private List<Long> tripTypeId;
+    }
+
+    @Getter
+    public static class ProfileUploadRequest{
+        private String fileName;
     }
 }

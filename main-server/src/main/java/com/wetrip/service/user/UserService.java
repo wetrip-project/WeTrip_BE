@@ -1,8 +1,11 @@
 package com.wetrip.service.user;
 
 import com.wetrip.user.entity.UserTripType;
+import com.wetrip.user.enums.Gender;
 import com.wetrip.user.repository.UserTripTypeRepository;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.wetrip.user.entity.User;
@@ -10,6 +13,7 @@ import com.wetrip.user.repository.UserRepository;
 
 import java.util.NoSuchElementException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -47,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateGenderAge(Long userId, User.Gender gender, Integer age) {
+    public User updateGenderAge(Long userId, Gender gender, Integer age) {
         User user = findByUser(userId);
         user.setGender(gender);
         user.setAge(age);
@@ -60,14 +64,15 @@ public class UserService {
         userTripTypeRepository.deleteByUserId(userId);
 
         //새로운 여행 타입 추가
-        List<UserTripType> userTripTypes = tripTypeId.stream()
-            .map(id -> UserTripType.builder()
-                .userId(userId)
-                .tripTypeId(id)
-                .build())
-            .toList();
-
-        userTripTypeRepository.saveAll(userTripTypes);
+        if (!CollectionUtils.isEmpty(tripTypeId)) {
+            List<UserTripType> userTripTypes = tripTypeId.stream()
+                .map(id -> UserTripType.builder()
+                    .userId(userId)
+                    .tripTypeId(id)
+                    .build())
+                .toList();
+            userTripTypeRepository.saveAll(userTripTypes);
+        }
     }
 
     public List<Long> findTripTypeId(Long userId) {
@@ -81,5 +86,46 @@ public class UserService {
         User user = findByUser(userId);
         user.setProfileImage(profileImage);
         return user;
+    }
+
+    @Transactional
+    public void completeOnboarding(Long userId, Map<Object, Object> data) {
+        User user = findByUser(userId);
+
+        user.setName(data.get("nickname").toString());
+        user.setGender(Gender.valueOf(data.get("gender").toString()));
+        user.setAge(Integer.parseInt(data.get("age").toString()));
+
+        Object profile = data.get("profile");
+        if (profile != null) {
+            user.setProfileImage(data.get("profile").toString());
+        }
+
+        List<Long> tripTypeId = castList(data.get("tripTypeId"));
+        updateTripType(userId, tripTypeId == null ? List.of() : tripTypeId);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Long> castList(Object raw) {
+        if (raw == null) return null;
+        if (raw instanceof List<?> list) {
+            return list.stream()
+                .map(v -> {
+                    if (v instanceof Number n) return n.longValue();
+                    return Long.parseLong(v.toString());
+                })
+                .toList();
+        }
+        // 단일 값이 들어온 경우
+        return List.of(Long.parseLong(raw.toString()));
+    }
+
+
+    private String getRequired(Map<Object, Object> map, String key) {
+        Object value = map.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("필수값 '" + key + "'가 누락되었습니다.");
+        }
+        return value.toString();
     }
 }

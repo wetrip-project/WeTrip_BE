@@ -39,7 +39,11 @@ public class SecurityConfig {
         .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 확인용
         .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
             .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**",
-                "/actuator/health", "/auth/**")
+                "/actuator/health", "/auth/**", "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/webjars/**")
             .permitAll() // 루트(/), 로그인 관련 경로, 정적 자원(css/js), H2 콘솔은 인증 없이 접근 허용
             .anyRequest().authenticated() // 위를 제외한 모든 요청은 인증 필요
         )

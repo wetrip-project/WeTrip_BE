@@ -6,7 +6,8 @@ import lombok.experimental.Accessors;
 @Builder
 public record SessionInfo(
     Long userId,
-    String sessionId
+    String sessionId,
+    String username
 ) {
 
 }

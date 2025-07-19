@@ -1,6 +1,7 @@
 package com.wetrip.chat.entity;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,18 +19,26 @@ public class ChatRoom {
 
     @Id
     @Column(nullable = false, length = 36)
-    private String id;
+    private UUID id;
 
     private String roomName;
 
     @Column(nullable = false)
     private String roomType;
 
+    private Integer limitNumber;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, length = 36)
-    private String roomStatus;
+//    @Column(nullable = false, length = 36)
+//    private String roomStatus;
+//
+//    private LocalDateTime deactivatedAt;
 
-    private LocalDateTime deactivatedAt;
+    @PrePersist
+    private void prePersist() {
+        if (id == null)
+            this.id = UUID.randomUUID();
+    }
 }

@@ -1,7 +1,7 @@
 package com.wetrip.config;
 
 import com.wetrip.config.annotations.ChatMessageMapping;
-import com.wetrip.dto.request.ChatMessage;
+import com.wetrip.dto.request.ChatMessageRequest;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class MessageMappingHandler implements ApplicationContextAware {
       for (var method : methods) {
         var annotation = method.getAnnotation(ChatMessageMapping.class);
         if (annotation != null) {
-          var path = annotation.path();
+          var path = annotation.type();
           log.debug("Found @ChatMessageMapping for path: {}", path);
           handlers.put(path, new HandlerMethod(bean, method));
         }
@@ -43,19 +43,19 @@ public class MessageMappingHandler implements ApplicationContextAware {
     });
   }
 
-  public Object routeMessage(String path, ChatMessage payload, WebSocketSession session)
+  public Object routeMessage(ChatMessageRequest chatMessageRequest, WebSocketSession session)
       throws Exception {
-    var handler = handlers.get(path);
+    var handler = handlers.get(chatMessageRequest.type());
     if (handler == null) {
-      throw new IllegalArgumentException("No handler found for path: " + path);
+      throw new IllegalArgumentException("No handler found for type: " + chatMessageRequest.type());
     }
 
-    var arguments = mappingArguments(payload, session, handler);
+    var arguments = mappingArguments(chatMessageRequest, session, handler);
 
     return handler.getMethod().invoke(handler.getBean(), arguments);
   }
 
-  private Object[] mappingArguments(ChatMessage payload, WebSocketSession session,
+  private Object[] mappingArguments(ChatMessageRequest payload, WebSocketSession session,
       HandlerMethod handler) {
     var method = handler.getMethod();
     var parameters = method.getParameters();
@@ -64,7 +64,7 @@ public class MessageMappingHandler implements ApplicationContextAware {
     for (int i = 0; i < parameters.length; i++) {
       var parameter = parameters[i];
 
-      if (parameter.getType().equals(ChatMessage.class)) {
+      if (parameter.getType().equals(ChatMessageRequest.class)) {
         arguments[i] = payload;
       } else if (parameter.getType().equals(WebSocketSession.class)) {
         arguments[i] = session;

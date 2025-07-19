@@ -2,8 +2,7 @@ name: Deploy wetrip_backend
 
 on:
   push:
-    tags:
-    - 'v*.*.*'
+    branches: ['main']
 
 jobs:
   ci:

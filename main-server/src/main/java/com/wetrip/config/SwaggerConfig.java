@@ -31,8 +31,7 @@ public class SwaggerConfig {
                     - 현재 버전: v1.0.0
                     """)
               .contact(new Contact()
-                    .name("WeTrip Development Team")
-                    .email("dev@wetrip.com")))
+                    .name("WeTrip Development Team")))
             .servers(List.of(
                 new Server().url("https://dev-wetrip.shop").description("운영 서버"),
                 new Server().url("http://localhost:8080").description("로컬 개발 서버")

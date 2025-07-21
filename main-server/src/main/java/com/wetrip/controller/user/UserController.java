@@ -181,6 +181,5 @@ public class UserController {
 
         return ResponseEntity.ok(new UserResponseDto(user, tripTypeId));
     }
-
 }
 

@@ -1,8 +1,7 @@
 package com.wetrip.dto.request;
 
-public record ChatMessage(
-    String type,
-    String path,
+public record ChatMessageRequest(
+    String sendType,
     String roomId,
     String userId,
     String message

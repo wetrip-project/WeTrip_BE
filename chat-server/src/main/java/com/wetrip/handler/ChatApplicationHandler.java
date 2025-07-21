@@ -39,7 +39,7 @@ public class ChatApplicationHandler extends TextWebSocketHandler {
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
       }
     } catch (Exception e) {
-      log.error("WS got error; session id: {}. message: {}", session.getId(), e.getMessage());
+      log.error("WS got error; session id: {}. message: {}", session.getId(), e.getMessage(), e);
       var response = ChatResponse.failed(e.getMessage());
       session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
     }

@@ -7,12 +7,15 @@ import com.wetrip.dto.request.ChatMessageRequest;
 import com.wetrip.dto.response.ChatResponse;
 import com.wetrip.dto.response.ResponseType;
 import com.wetrip.repository.RedisService;
+import com.wetrip.user.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketSession;
 
 @Service
@@ -22,13 +25,20 @@ public class ChatService {
   private final ChatParticipantRepository chatParticipantRepository;
   private final MessageService messageService;
   private final RedisService redisService;
+  private final UserRepository userRepository;
 
+  @Transactional
   public ChatResponse joinRoom(WebSocketSession session, ChatMessageRequest request) {
     var roomId = UUID.fromString(request.roomId());
     var userId = Long.parseLong(request.userId());
-    var chatParticipant = chatParticipantRepository.findByChatRoomIdAndUserId(roomId, userId);
+    var user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+      return ChatResponse.failed("User not found; userId = " + userId);
+    }
 
+    var chatParticipant = chatParticipantRepository.findByChatRoomIdAndUserId(roomId, userId);
     cachedJoinRoom(roomId, userId);
+
     if (chatParticipant == null) {
       chatParticipant = ChatParticipant.builder()
           .chatRoomId(roomId)
@@ -36,7 +46,7 @@ public class ChatService {
           .participationDate(LocalDateTime.now())
           .build();
       chatParticipant = chatParticipantRepository.saveAndFlush(chatParticipant);
-      messageService.sendJoinMessage(roomId);
+      messageService.sendJoinMessage(user, roomId);
 
     }
 
@@ -52,7 +62,7 @@ public class ChatService {
       return;
     }
 
-    var users = new ArrayList<Long>();
+    var users = new HashSet<Long>();
     users.add(userId);
     roomInfo = RoomInfo.builder()
         .users(users)

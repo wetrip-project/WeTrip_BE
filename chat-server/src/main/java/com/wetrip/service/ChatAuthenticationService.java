@@ -22,7 +22,7 @@ public class ChatAuthenticationService {
   public boolean roomValidation(ChatMessageRequest request) {
     /* TODO(haechan.yoo): JoinHistory 로직 설계 이후 히스토리 검사 */
     var roomId = UUID.fromString(request.roomId());
-    var chatRoom = chatRoomRepository.findById(roomId).orElseGet(null);
+    var chatRoom = chatRoomRepository.findById(roomId).orElse(null);
 
     if (chatRoom == null) {
       log.error("Room does not exist; roomId: {}", roomId);

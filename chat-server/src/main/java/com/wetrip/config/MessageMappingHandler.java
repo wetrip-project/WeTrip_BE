@@ -45,9 +45,9 @@ public class MessageMappingHandler implements ApplicationContextAware {
 
   public Object routeMessage(ChatMessageRequest chatMessageRequest, WebSocketSession session)
       throws Exception {
-    var handler = handlers.get(chatMessageRequest.type());
+    var handler = handlers.get(chatMessageRequest.sendType());
     if (handler == null) {
-      throw new IllegalArgumentException("No handler found for type: " + chatMessageRequest.type());
+      throw new IllegalArgumentException("No handler found for sendType: " + chatMessageRequest.sendType());
     }
 
     var arguments = mappingArguments(chatMessageRequest, session, handler);

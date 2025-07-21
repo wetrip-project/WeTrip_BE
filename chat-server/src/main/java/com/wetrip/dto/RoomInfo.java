@@ -2,13 +2,15 @@ package com.wetrip.dto;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import org.springframework.util.CollectionUtils;
 
 @Builder
 public class RoomInfo {
-  private List<Long> users;
+  private Set<Long> users;
 
   public boolean isJoined(Long userId) {
     return users.contains(userId);
@@ -16,7 +18,7 @@ public class RoomInfo {
 
   public void addUser(Long userId) {
     if (CollectionUtils.isEmpty(users)) {
-      this.users = new ArrayList<>();
+      this.users = new HashSet<>();
     }
     users.add(userId);
   }
@@ -28,7 +30,7 @@ public class RoomInfo {
     users.remove(userId);
   }
 
-  public List<Long> getUsers() {
-    return Collections.unmodifiableList(users);
+  public Set<Long> getUsers() {
+    return Collections.unmodifiableSet(users);
   }
 }

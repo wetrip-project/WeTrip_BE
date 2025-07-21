@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 public class ChatRoom {
 
     @Id
-    @Column(nullable = false, length = 36)
     private UUID id;
 
     private String roomName;

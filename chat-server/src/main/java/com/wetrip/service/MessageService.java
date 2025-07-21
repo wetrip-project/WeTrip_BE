@@ -11,6 +11,7 @@ import com.wetrip.dto.request.ChatMessageRequest;
 import com.wetrip.dto.response.ChatResponse;
 import com.wetrip.dto.response.ResponseType;
 import com.wetrip.repository.RedisService;
+import com.wetrip.user.entity.User;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -45,10 +46,10 @@ public class MessageService {
     this.objectMapper = objectMapper;
   }
 
-  public void sendJoinMessage(UUID roomId) {
+  public void sendJoinMessage(User joinedUser, UUID roomId) {
     var key = "room:{" + roomId + "}";
     final var roomInfo = redisService.getObject(key, RoomInfo.class);
-    List<Long> users = roomInfo.getUsers();
+    final var users = roomInfo.getUsers();
 
     users.forEach(user -> {
       CompletableFuture.runAsync(() -> {
@@ -56,7 +57,7 @@ public class MessageService {
         var sessionInfo = redisService.getObject(userKey, SessionInfo.class);
         if (sessionInfo != null) {
           var session = sessionManager.get(sessionInfo.sessionId());
-          var message = ChatResponse.success(ResponseType.JOIN_ROOM, sessionInfo.username() + "님이 입장하셨습니다.");
+          var message = ChatResponse.success(ResponseType.JOIN_ROOM, joinedUser.getName() + "님이 입장하셨습니다.");
           sendMessage(session, message);
         }
       }, taskExecutor);

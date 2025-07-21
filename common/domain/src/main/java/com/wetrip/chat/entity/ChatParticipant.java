@@ -21,7 +21,7 @@ public class ChatParticipant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 36)
+    @Column(nullable = false)
     private UUID chatRoomId;
 
     @Column(nullable = false)

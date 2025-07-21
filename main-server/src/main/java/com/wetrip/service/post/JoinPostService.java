@@ -53,11 +53,13 @@ public class JoinPostService {
     var travelTags = request.travelTags().stream()
         .map(title -> Tags.builder()
             .tagType(TagType.TRAVEL)
-            .title(title).build());
+            .title(title)
+            .postId(newPost.getId()).build());
     var preferTas = request.preferTags().stream()
         .map(title -> Tags.builder()
             .tagType(TagType.PREFER)
-            .title(title).build());
+            .title(title)
+            .postId(newPost.getId()).build());
 
     var allTags = Stream.concat(travelTags, preferTas)
         .toList();

@@ -20,6 +20,11 @@ public class RedisOnboardingService {
         redisTemplate.opsForHash().put(key(userId), field, value);
     }
 
+    // 한 항목 조회
+    public Object getStep(Long userId, String field) {
+        return redisTemplate.opsForHash().get(key(userId), field);
+    }
+
     // 모든 항목 조회
     public Map<Object, Object> getAll(Long userId) {
         return redisTemplate.opsForHash().entries(key(userId));

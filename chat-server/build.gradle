@@ -3,17 +3,41 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
+bootJar {
+    archiveFileName = 'app.jar'
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
 group = 'com.wetrip'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
 
+    api project(':common:dbms')
+    api project(':common:domain')
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ
-    implementation 'org.springframework.boot:spring-boot-starter-security' // 채팅 사용자 인증이 필요하다면
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Redis
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

@@ -1,6 +1,7 @@
 package com.wetrip.post.entity;
 
 import com.wetrip.post.enums.TagType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,4 +30,7 @@ public class Tags {
   private TagType tagType;
 
   private String title;
+
+  @Column(name = "post_id")
+  private Long postId;
 }

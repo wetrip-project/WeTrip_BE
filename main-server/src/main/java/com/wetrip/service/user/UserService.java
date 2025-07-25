@@ -1,5 +1,7 @@
 package com.wetrip.service.user;
 
+import com.wetrip.exception.user.DuplicateNicknameException;
+import com.wetrip.exception.user.UserNotFoundException;
 import com.wetrip.user.entity.UserTripType;
 import com.wetrip.user.enums.Gender;
 import com.wetrip.user.repository.UserTripTypeRepository;
@@ -10,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.wetrip.user.entity.User;
 import com.wetrip.user.repository.UserRepository;
+import com.wetrip.exception.user.*;
 
-import java.util.NoSuchElementException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -25,7 +27,7 @@ public class UserService {
 
     public User findByUser(final Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다"));
+            .orElseThrow(UserNotFoundException::new);
     }
 
     public void validateNickname(String name) {
@@ -38,7 +40,7 @@ public class UserService {
         }
 
         if (userRepository.existsByName(name)) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            throw new DuplicateNicknameException();
         }
     }
 

@@ -2,7 +2,7 @@ name: Deploy wetrip_backend
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: ['main']
 
 jobs:
   ci:

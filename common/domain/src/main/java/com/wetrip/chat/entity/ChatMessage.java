@@ -1,6 +1,7 @@
 package com.wetrip.chat.entity;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +20,8 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 36)
-    private String chatRoomId;
+    @Column(nullable = false)
+    private UUID chatRoomId;
 
     @Column(nullable = false)
     private Long userId;

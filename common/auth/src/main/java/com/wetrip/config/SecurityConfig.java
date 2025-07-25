@@ -72,6 +72,8 @@ public class SecurityConfig {
     var config = new CorsConfiguration();
     config.setAllowedOrigins(Arrays.asList(corsProperties.origins()));
     config.setAllowedMethods(Arrays.asList(corsProperties.methods()));
+    config.setAllowedHeaders(Arrays.asList(corsProperties.allowedHeaders())); // cors 오류 해결
+    config.setExposedHeaders(Arrays.asList(corsProperties.exposedHeaders()));
     config.setMaxAge(corsProperties.maxAge());
     config.setAllowCredentials(true);
 

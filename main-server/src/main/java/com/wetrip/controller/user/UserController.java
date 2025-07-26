@@ -145,8 +145,6 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping
-
     @Operation(summary = "프로필 사진 저장", description = "회원가입 과정에서 업로드된 프로필 사진 정보를 임시 저장합니다.")
     @ApiResponse(responseCode = "200", description = "프로필 사진 저장 성공")
     @PostMapping("/profile_photo_save")

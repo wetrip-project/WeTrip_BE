@@ -2,6 +2,7 @@ package com.wetrip.controller.user;
 
 import com.wetrip.dto.joinpost.JoinPostSummaryDto;
 import com.wetrip.post.enums.RecruitmentStatus;
+import com.wetrip.post.repository.RecentViewsRepository;
 import com.wetrip.service.user.MyPageService;
 import com.wetrip.user.entity.User;
 import com.wetrip.user.repository.UserRepository;
@@ -21,6 +22,7 @@ public class MyPageController {
   private final MyPageService myPageService;
   private final UserRepository userRepository;
 
+
   @GetMapping("/posts")
   public List<JoinPostSummaryDto> getMyPosts(Authentication authentication, @RequestParam
   RecruitmentStatus status) {
@@ -29,5 +31,12 @@ public class MyPageController {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     return myPageService.getMyPostStatus(user, status);
+  }
+
+  // 최근 본 동행글 목록 조회
+  @GetMapping("/recent_view")
+  public List<JoinPostSummaryDto> getRecentViewPost(Authentication authentication) {
+    Long userId = Long.parseLong(authentication.getName());
+    return myPageService.getRecentViewPost(userId);
   }
 }

@@ -102,11 +102,13 @@ jobs:
             echo "🐳 Docker Tag: ${{ env.DOCKER_TAG }}"
 
             # AWS ECR login
+            echo "Login ECR"
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 926806297566.dkr.ecr.ap-northeast-2.amazonaws.com
             
             # Pull the new image
             echo "🐳 Docker Image Pull"
             docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            
             echo "chat-server pull"
             docker pull $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
 
@@ -126,6 +128,7 @@ jobs:
             docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
             docker commit temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
             docker rm temp_container
+            
             docker create --name temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
             docker cp /home/ubuntu/wetrip-main/.env temp_container_chat:/app/.env
             docker commit temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
@@ -139,6 +142,7 @@ jobs:
               --log-opt max-size=10m \
               --log-opt max-file=3 \
               whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+              
             docker run -d --name chat-server \
               -p 8081:8081 \
               --log-driver json-file \

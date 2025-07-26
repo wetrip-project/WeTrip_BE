@@ -76,6 +76,17 @@ jobs:
       DOCKER_TAG: ${{ needs.ci.outputs.docker-tag }}
 
     steps:
+      - name: Configuration AWS crendtials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCOUNT_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -93,6 +104,7 @@ jobs:
             # Pull the new image
             echo "🐳 Docker Image Pull"
             docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            echo "chat-server pull
             docker pull $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
 
             # Stop & Remove existing container if exists
@@ -112,7 +124,7 @@ jobs:
             docker commit temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
             docker rm temp_container
             docker create --name temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
-            docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
+            docker cp /home/ubuntu/wetrip-main/.env temp_container_chat:/app/.env
             docker commit temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
             docker rm temp_container_chat
             

@@ -76,6 +76,9 @@ public class SessionTokenService {
       Optional<TokenInfoDto> tokenInfo = getTokenInfoByUserId(userId);
 
       if (tokenInfo.isPresent() && accessToken.equals(tokenInfo.get().getAccessToken())) {
+        log.info("요청 토큰: '{}'", accessToken);
+        log.info("Redis 토큰: '{}'", tokenInfo.get().getAccessToken());
+
         return Optional.of(userId);
       }
       log.debug("Redis에 저장된 토큰과 일치하지 않습니다. userId: {}", userId);

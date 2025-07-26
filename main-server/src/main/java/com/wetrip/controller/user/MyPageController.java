@@ -32,4 +32,18 @@ public class MyPageController {
         .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     return myPageService.getMyPostStatus(user, status);
   }
+
+  // 스크랩한 동행글 목록 조회
+  @GetMapping("/scrap/join_posts")
+  public List<JoinPostSummaryDto> getScrapJoinPosts(Authentication authentication) {
+    Long userId = Long.parseLong(authentication.getName());
+    return myPageService.getScrapPost(userId);
+  }
+
+/*  // 스크랩한 커뮤니티 글 목록 조회 - 보류
+  @GetMapping("/scrap/community")
+  public List<JoinPostSummaryDto> getScrapCommunity(Authentication authentication) {
+    Long userId = Long.parseLong(authentication.getName());
+    return myPageService.getScrapPost(userId);
+  }*/
 }

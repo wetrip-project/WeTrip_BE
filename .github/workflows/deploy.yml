@@ -104,7 +104,7 @@ jobs:
             # Pull the new image
             echo "🐳 Docker Image Pull"
             docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
-            echo "chat-server pull
+            echo "chat-server pull"
             docker pull $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
 
             # Stop & Remove existing container if exists

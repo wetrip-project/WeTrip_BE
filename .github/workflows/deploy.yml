@@ -100,6 +100,9 @@ jobs:
             
             # Check docker tags
             echo "🐳 Docker Tag: ${{ env.DOCKER_TAG }}"
+
+            # AWS ECR login
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 926806297566.dkr.ecr.ap-northeast-2.amazonaws.com
             
             # Pull the new image
             echo "🐳 Docker Image Pull"

@@ -39,7 +39,7 @@ public class SecurityConfig {
         .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 확인용
         .authorizeHttpRequests(auth -> auth // URL 경로별 접근 권한 설정
             .requestMatchers("/", "/login/**", "/css/**", "/js/**", "/h2-console/**",
-                "/actuator/health", "/auth/**", "/v3/api-docs/**",
+                "/actuator/health", "/auth/**", "/api/auth/**", "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
                 "/swagger-resources/**",

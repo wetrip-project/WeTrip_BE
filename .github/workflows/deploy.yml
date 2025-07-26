@@ -83,10 +83,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Check logs
-            echo "📜 Fetching logs from running container..."
-            docker logs --tail 100 careit
-            
             # Check containers
             echo "🐳 Checking running containers"
             docker ps -a
@@ -97,7 +93,7 @@ jobs:
             # Pull the new image
             echo "🐳 Docker Image Pull"
             docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
-            docker pull $ECR_REPOSITORY:latest
+            docker pull $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
 
             # Stop & Remove existing container if exists
             if [ $(docker ps -aq -f name=wetrip-main) ]; then
@@ -115,9 +111,9 @@ jobs:
             docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
             docker commit temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
             docker rm temp_container
-            docker create --name temp_container_chat $ECR_REPOSITORY:latest
+            docker create --name temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
             docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
-            docker commit temp_container_chat $ECR_REPOSITORY:latest
+            docker commit temp_container_chat $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
             docker rm temp_container_chat
             
             # Start new container
@@ -133,7 +129,7 @@ jobs:
               --log-driver json-file \
               --log-opt max-size=10m \
               --log-opt max-file=3 \
-              $ECR_REPOSITORY:latest
+              $ECR_REPOSITORY:${{ env.DOCKER_TAG }}
             
             # Check
             echo "🐳 Docker ps"

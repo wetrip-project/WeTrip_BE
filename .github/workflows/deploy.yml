@@ -76,17 +76,6 @@ jobs:
       DOCKER_TAG: ${{ needs.ci.outputs.docker-tag }}
 
     steps:
-      - name: Configuration AWS crendtials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCOUNT_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ap-northeast-2
-
-      - name: Login ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:

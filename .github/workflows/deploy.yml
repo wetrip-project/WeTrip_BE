@@ -2,7 +2,10 @@ name: Deploy wetrip_backend
 
 on:
   push:
-    branches: ['main']
+    branches: [ 'main' ]
+
+env:
+  ECR_REPOSITORY: 926806297566.dkr.ecr.ap-northeast-2.amazonaws.com/wetrip-chat
 
 jobs:
   ci:
@@ -40,11 +43,27 @@ jobs:
           format: YYYY-MM-DDTHH-mm-ss
           utcOffset: "+09:00"
 
-      - name: Docker build
+      - name: Configuration AWS crendtials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCOUNT_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker build - main server
         run: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker build -f ./main-server/Dockerfile -t whwkahd3/wetrip-main:${{ steps.current-time.outputs.formattedTime }} .
           docker push whwkahd3/wetrip-main:${{ steps.current-time.outputs.formattedTime }}
+
+      - name: Docker build - chat server
+        run: |
+          docker build -f ./chat-server/Dockerfile -t $ECR_REPOSITORY:${{ steps.current-time.outputs.formattedTime }} .
+          docker push $ECR_REPOSITORY:${{ steps.current-time.outputs.formattedTime }}
 
       - name: Set Docker Tag Output
         id: set-docker-tag
@@ -52,7 +71,7 @@ jobs:
 
   cd:
     runs-on: ubuntu-24.04
-    needs: [ci]
+    needs: [ ci ]
     env:
       DOCKER_TAG: ${{ needs.ci.outputs.docker-tag }}
 
@@ -78,13 +97,16 @@ jobs:
             # Pull the new image
             echo "🐳 Docker Image Pull"
             docker pull whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            docker pull $ECR_REPOSITORY:latest
 
             # Stop & Remove existing container if exists
             if [ $(docker ps -aq -f name=wetrip-main) ]; then
               echo "🐳 Stopping existing container"
               docker stop wetrip-main || true
+              docker stop chat-server || true
               echo "🐳 Removing existing container"
               docker rm wetrip-main || true
+              docker rm chat-server || true
             fi
             
             # Copy .env file into the new container
@@ -93,6 +115,10 @@ jobs:
             docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
             docker commit temp_container whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
             docker rm temp_container
+            docker create --name temp_container_chat $ECR_REPOSITORY:latest
+            docker cp /home/ubuntu/wetrip-main/.env temp_container:/app/.env
+            docker commit temp_container_chat $ECR_REPOSITORY:latest
+            docker rm temp_container_chat
             
             # Start new container
             echo "🐳 Docker Run"
@@ -102,6 +128,12 @@ jobs:
               --log-opt max-size=10m \
               --log-opt max-file=3 \
               whwkahd3/wetrip-main:${{ env.DOCKER_TAG }}
+            docker run -d --name chat-server \
+              -p 8081:8081 \
+              --log-driver json-file \
+              --log-opt max-size=10m \
+              --log-opt max-file=3 \
+              $ECR_REPOSITORY:latest
             
             # Check
             echo "🐳 Docker ps"

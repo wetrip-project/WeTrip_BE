@@ -27,37 +27,40 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class JoinPost extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String title;
+  @Column(nullable = false)
+  private String title;
 
-    @Column(nullable = false)
-    private LocalDate travelStartDate;
+  @Column(nullable = false)
+  private LocalDate travelStartDate;
 
-    @Column(nullable = false)
-    private LocalDate travelEndDate;
+  @Column(nullable = false)
+  private LocalDate travelEndDate;
 
-    @Column(nullable = false)
-    private String travelCountry;
+  @Column(nullable = false)
+  private String travelCountry;
 
-    private String travelCity;
+  private String travelCity;
 
-    @Column(nullable = false)
-    private String introduction;
+  @Column(nullable = false)
+  private String introduction;
 
-    @Enumerated(EnumType.STRING)
-    private Gender recruitmentGender;
+  @Enumerated(EnumType.STRING)
+  private Gender recruitmentGender;
 
-    private String recruitmentAge;
+  private String recruitmentAge;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RecruitmentStatus recruitmentStatus;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private RecruitmentStatus recruitmentStatus;
 
-    private String estimatedAmount;
+  private String estimatedAmount;
+
+  @Column(nullable = false)
+  private Integer scarpCount = 0; // 스크랩 수
 
 //    @Enumerated(EnumType.STRING)
 //    private Tag tag;
@@ -65,33 +68,33 @@ public class JoinPost extends BaseEntity {
 //    @Column(nullable = false)
 //    private LocalDate recruitmentStartDate;
 
-    @Column(nullable = false)
-    private LocalDate recruitmentEndDate;
+  @Column(nullable = false)
+  private LocalDate recruitmentEndDate;
 
 //    private String course;
 
-    private Integer recruitmentCount;
+  private Integer recruitmentCount;
 
 //  @Column(nullable = false)
 //  @CreatedDate
 //  private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private Long viewCount = 0L;
+  @Column(nullable = false)
+  private Long viewCount = 0L;
 
-    // 관계 매핑
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+  // 관계 매핑
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<Thumbnail> thumbnails = new ArrayList<>();
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+  private List<Thumbnail> thumbnails = new ArrayList<>();
 
-    @BatchSize(size = 10)
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private List<Course> courses = new ArrayList<>();
+  @BatchSize(size = 10)
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "post_id")
+  private List<Course> courses = new ArrayList<>();
 
 //
 //    @ManyToOne(fetch = FetchType.LAZY)

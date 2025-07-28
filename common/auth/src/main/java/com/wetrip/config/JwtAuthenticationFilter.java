@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends
             log.debug("사용자 인증 성공: {}", userId);
           }
         } else {
-          log.warn("Redis에 토큰 정보가 없음. token: {}", token.substring(0, 10));
+          log.warn("Redis에 토큰 정보가 없음. token: {}", token);
         }
       }
     } catch (Exception e) {

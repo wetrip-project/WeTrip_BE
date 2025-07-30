@@ -55,6 +55,17 @@ public class JwtTokenProvider {
       return false;
     }
   }
+//  public boolean validateToken(String token) {
+//    try {
+//      Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+//      return true;
+//    } catch (ExpiredTokenException e) {
+//      throw new ExpiredTokenException();
+//    }
+//    catch (JwtException | IllegalArgumentException e) {
+//      throw new InvalidTokenException();
+//    }
+//  }
 
   // 토큰에서 사용자 ID 추출
   public String getUserIdFromToken(String token) {

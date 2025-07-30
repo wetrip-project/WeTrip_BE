@@ -1,6 +1,5 @@
 package com.wetrip.dto;
 
-import com.wetrip.user.enums.Gender;
 import java.util.List;
 import lombok.Getter;
 
@@ -13,7 +12,7 @@ public class UserRequestDto {
 
     @Getter
     public static class GenderAgeRequest{
-        private Gender gender;
+        private String gender;
         private Integer age;
     }
 

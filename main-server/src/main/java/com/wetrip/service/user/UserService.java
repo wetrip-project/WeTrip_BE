@@ -8,6 +8,7 @@ import com.wetrip.user.repository.UserTripTypeRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.wetrip.user.entity.User;
@@ -52,12 +53,43 @@ public class UserService {
         return user;
     }
 
+public void validateGender(String gender) {
+    if (gender == null || gender.isBlank()) {
+        throw new GenderMissingException();
+    }
+    String normalized = gender.trim().toLowerCase();
+    if (!normalized.equals("male") && !normalized.equals("female")) {
+        throw new IllegalArgumentException("유효하지 않은 성별입니다.");
+    }
+}
+
+    public void validateAge(Integer age) {
+        if (age == null) {
+            throw new AgeMissingException();
+        }
+        if (age < 10 || age >80) {
+            throw new IllegalArgumentException("유효하지 않은 나이입니다.");
+        }
+    }
+
     @Transactional
     public User updateGenderAge(Long userId, Gender gender, Integer age) {
         User user = findByUser(userId);
         user.setGender(gender);
         user.setAge(age);
         return user;
+    }
+
+    public void validateTripType(List<Long> tripTypes) {
+        if (tripTypes == null || tripTypes.isEmpty()) {
+            return;
+        }
+
+        for(Long type : tripTypes) {
+            if (type == null || type < 1 || type > 6) {
+                throw new InvalidTripTypeException();
+            }
+        }
     }
 
     @Transactional
@@ -93,6 +125,23 @@ public class UserService {
     @Transactional
     public void completeOnboarding(Long userId, Map<Object, Object> data) {
         User user = findByUser(userId);
+
+        String nickname = Optional.ofNullable(data.get("nickname"))
+                .map(Object::toString)
+                    .orElseThrow(()->new IllegalArgumentException("닉네임은 필수 입력값입니다."));
+        String genderStr = Optional.ofNullable(data.get("gender"))
+            .map(Object::toString)
+            .orElseThrow(() -> new IllegalArgumentException("성별은 필수 입력값입니다."));
+        String ageStr = Optional.ofNullable(data.get("age"))
+            .map(Object::toString)
+            .orElseThrow(() -> new IllegalArgumentException("나이는 필수 입력값입니다."));
+
+        Gender gender;
+        try {
+            gender = Gender.valueOf(genderStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 성별 값입니다.");
+        }
 
         user.setName(data.get("nickname").toString());
         user.setGender(Gender.valueOf(data.get("gender").toString()));

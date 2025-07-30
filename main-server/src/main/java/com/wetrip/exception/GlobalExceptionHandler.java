@@ -13,7 +13,9 @@ import com.wetrip.exception.user.*;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,6 +24,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     // user 관련
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException e) {
+        return buildResponse(ErrorCode.INVALID_TOKEN, e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredToken(ExpiredTokenException e) {
+        return buildResponse(ErrorCode.EXPIRED_TOKEN, e.getMessage());
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e) {
         return buildResponse(ErrorCode.USER_NOT_FOUND, e.getMessage());
@@ -30,6 +42,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateNicknameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateNickname(DuplicateNicknameException e) {
         return buildResponse(ErrorCode.DUPLICATE_NICKNAME, e.getMessage());
+    }
+
+    @ExceptionHandler(GenderMissingException.class)
+    public ResponseEntity<ErrorResponse> handleGenderMissing(GenderMissingException e) {
+        return buildResponse(ErrorCode.MISSING_GENDER, e.getMessage());
+    }
+
+    @ExceptionHandler(AgeMissingException.class)
+    public ResponseEntity<ErrorResponse> handleAgeMissing(AgeMissingException e) {
+        return buildResponse(ErrorCode.MISSING_AGE, e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTripTypeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTripType(InvalidTripTypeException e) {
+        return buildResponse(ErrorCode.INVALID_TRIP_TYPE, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,6 +73,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
         return buildResponse(ErrorCode.INVALID_ARGUMENT, e.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleJsonParseError(HttpMessageNotReadableException e) {
+        // Json 구조 자체가 잘못된 경우 -> 아예 빈칸이거나 잘못된 Json
+        return buildResponse(ErrorCode.INVALID_ARGUMENT, "요청 형식이 잘못되었습니다. (JSON 파싱 실패)");
     }
 
 
@@ -105,6 +138,7 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildResponse(ErrorCode errorCode, String detailMessage) {
         return ResponseEntity
             .status(errorCode.getStatus())
+            .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse.of(errorCode, detailMessage));
     }
 }

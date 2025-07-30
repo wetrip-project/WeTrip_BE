@@ -5,6 +5,9 @@ import com.wetrip.dto.UserRequestDto.NicknameRequest;
 import com.wetrip.dto.UserRequestDto.ProfileUploadRequest;
 import com.wetrip.dto.UserRequestDto.TripTypeRequest;
 import com.wetrip.dto.UserResponseDto;
+import com.wetrip.exception.user.AgeMissingException;
+import com.wetrip.exception.user.GenderMissingException;
+import com.wetrip.exception.user.InvalidTripTypeException;
 import com.wetrip.service.S3Service;
 import com.wetrip.service.user.UserService;
 import com.wetrip.service.Redis.RedisOnboardingService;
@@ -21,6 +24,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,6 +81,9 @@ public class UserController {
         @AuthenticationPrincipal String userId,
         @RequestBody GenderAgeRequest request) {
 
+        userService.validateGender(request.getGender());
+        userService.validateAge(request.getAge());
+
         redisOnboardingService.saveStep(Long.parseLong(userId), "gender", request.getGender().toString());
         redisOnboardingService.saveStep(Long.parseLong(userId), "age", request.getAge().toString());
 
@@ -106,6 +113,7 @@ public class UserController {
         @AuthenticationPrincipal String userId,
         @RequestBody TripTypeRequest request) {
 
+        userService.validateTripType(request.getTripTypeId());
         redisOnboardingService.saveStep(Long.parseLong(userId), "tripTypeId", request.getTripTypeId());
 
         return ResponseEntity.ok(Map.of("message", "여행 타입이 저장되었습니다."));

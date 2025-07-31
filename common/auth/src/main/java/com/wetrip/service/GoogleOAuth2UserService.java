@@ -61,7 +61,7 @@ public class GoogleOAuth2UserService implements OAuth2UserServiceInterface {
     );
 
     // redis 세션에 토큰 저장
-    sessionTokenService.saveTokenInfo(savedUser.getId(), tokenInfo);
+    sessionTokenService.saveRefreshToken(savedUser.getId(), tokenInfo.getRefreshToken());
 
     Map<String, Object> attributesWithUserId = new HashMap<>(attributes);
     attributesWithUserId.put("userId", savedUser.getId());

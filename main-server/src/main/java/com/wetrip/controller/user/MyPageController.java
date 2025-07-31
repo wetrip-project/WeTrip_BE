@@ -25,8 +25,7 @@ public class MyPageController {
   @GetMapping("/posts")
   public List<JoinPostSummaryDto> getMyPosts(Authentication authentication, @RequestParam
   RecruitmentStatus status) {
-    DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
-    Long userId = oauthUser.getAttribute("userId");
+    Long userId = Long.parseLong(authentication.getName());
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));

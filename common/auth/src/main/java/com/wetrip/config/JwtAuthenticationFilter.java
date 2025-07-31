@@ -5,6 +5,7 @@ import com.wetrip.service.SessionTokenService;
 import com.wetrip.utils.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -46,28 +47,11 @@ public class JwtAuthenticationFilter extends
       String token = extractTokenFromRequest(request);
       if (token != null && jwtTokenProvider.validateToken(token)) {
         String userId = jwtTokenProvider.getUserIdFromToken(token);
-        Optional<Long> userIdFromRedis = sessionTokenService.getUserIdByAccessToken(token);
-
-        if (userIdFromRedis.isPresent() && userIdFromRedis.get().toString().equals(userId)) {
-          Optional<TokenInfoDto> tokenInfo = sessionTokenService.getTokenInfoByUserId(
-              userIdFromRedis.get());
-          if (tokenInfo.isPresent()) {
-            sessionTokenService.saveTokenInfo(userIdFromRedis.get(), tokenInfo.get());
-            sessionTokenService.extendTokenExpiration(userIdFromRedis.get());
-
-            // 추후 신고 누적에 따른 차단 및 관리자 권한 기능 고려
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
-                );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("사용자 인증 성공: {}", userId);
-          }
-        } else {
-          log.warn("Redis에 토큰 정보가 없음. token: {}", token.substring(0, 10));
-        }
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(userId, null,
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        log.debug("사용자 인증 성공 : {}", userId);
       }
     } catch (Exception e) {
       log.error("JWT 인증 처리 중 오류 발생", e);
@@ -76,9 +60,18 @@ public class JwtAuthenticationFilter extends
   }
 
   private String extractTokenFromRequest(HttpServletRequest request) {
+    // 헤더 우선
     String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
       return bearerToken.substring(BEARER_PREFIX.length());
+    }
+    // 쿠키에서 액세스 토큰 찾기
+    if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if ("accessToken".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
     }
     return null;
   }

@@ -1,14 +1,14 @@
 package com.wetrip.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wetrip.dto.TokenInfoDto;
+import com.wetrip.service.AuthService;
+import com.wetrip.service.SessionTokenService;
 import com.wetrip.user.entity.User;
 import com.wetrip.user.repository.UserRepository;
 import com.wetrip.utils.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,6 +27,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
+  private final SessionTokenService sessionTokenService;
+  private final AuthService authService;
 
   @Value("${frontend.base-url}")
   private String frontendBaseUrl;
@@ -37,7 +38,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
       HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-    System.out.println("OAuth2User Attributes: " + oAuth2User.getAttributes());
 
     OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) authentication;
     String registrationId = authToken.getAuthorizedClientRegistrationId();
@@ -51,6 +51,16 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalStateException("해당 userId로 사용자를 찾을 수 없습니다."));
 
+    // 토큰 한 번만 생성
+    TokenInfoDto tokenInfo = new TokenInfoDto(
+        userId,
+        jwtTokenProvider.createAccessToken(user.getId().toString()),
+        jwtTokenProvider.createRefreshToken(user.getId().toString()),
+        null, // socialAccessToken
+        null, // socialRefreshToken
+        registrationId
+    );
+
     // 플랫폼별 ID 추출
     String socialId = switch (registrationId) {
       case "kakao" -> oAuth2User.getAttribute("id").toString();      // Long 형태
@@ -63,17 +73,15 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
       default -> throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다: " + registrationId);
     };
 
-    // 토큰 생성
-    String accessToken = jwtTokenProvider.createAccessToken(user.getId().toString());
-    String refreshToken = jwtTokenProvider.createRefreshToken(user.getId().toString());
+    // redis에 저장
+    sessionTokenService.saveRefreshToken(user.getId(), tokenInfo.getRefreshToken());
+
+    // 쿠키 저장
+    authService.setTokenCookies(response, tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(),
+        authService.isProd());
 
     String callbackPath = "/auth/" + registrationId + "/callback";
-    String encodedAccessToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
-    String encodedRefreshToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
-
-    String frontendRedirectUrl = frontendBaseUrl + callbackPath
-        + "?accessToken=" + encodedAccessToken
-        + "&refreshToken=" + encodedRefreshToken;
+    String frontendRedirectUrl = frontendBaseUrl + callbackPath;
     response.sendRedirect(frontendRedirectUrl);
   }
 }
